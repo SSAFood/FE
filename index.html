@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SSAFooD - 홈</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@400;600;700&display=swap');
+        body { font-family: 'Pretendard', sans-serif; }
+        .active-tab { color: #f97316; background-color: #f97316; color: white; border-radius: 9999px; }
+        .tab-transition { transition: all 0.3s ease; }
+    </style>
+</head>
+<body class="bg-[radial-gradient(circle_at_top,_#fff7ed,_#f8fafc_60%)] text-slate-800">
+    <div id="app" class="mx-auto flex min-h-screen max-w-7xl flex-col px-3 py-3 md:px-6 md:py-6 lg:px-8">
+        <div class="overflow-hidden rounded-[32px] border border-slate-200 bg-white shadow-[0_20px_60px_-20px_rgba(15,23,42,0.25)]">
+            <!-- Header / Navigation -->
+            <header class="sticky top-0 z-50 border-b border-slate-100 bg-white/90 px-5 py-4 backdrop-blur md:px-8">
+                <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                    <div>
+                        <p class="text-sm font-semibold uppercase tracking-[0.3em] text-orange-500">SSAFooD</p>
+                        <h1 class="text-2xl font-bold tracking-tight text-slate-900">광주 전라권 맛집 탐색</h1>
+                    </div>
+                    <nav class="flex flex-wrap gap-2 rounded-full border border-slate-200 bg-slate-50 p-1.5">
+                        <a href="index.html" class="rounded-full px-4 py-2 text-sm font-semibold tab-transition active-tab bg-orange-500 text-white shadow-sm cursor-pointer">홈</a>
+                        <a href="map.html" class="rounded-full px-4 py-2 text-sm font-semibold tab-transition text-slate-600 hover:bg-white hover:text-orange-500 cursor-pointer">지도</a>
+                        <a href="chat.html" class="rounded-full px-4 py-2 text-sm font-semibold tab-transition text-slate-600 hover:bg-white hover:text-orange-500 cursor-pointer">AI 챗봇</a>
+                    </nav>
+                </div>
+            </header>
+
+            <main class="flex-1 overflow-y-auto p-4 md:p-8">
+                <!-- Home View -->
+                <div class="space-y-6">
+                    <section class="rounded-[28px] bg-gradient-to-br from-orange-500 via-orange-400 to-amber-300 p-6 text-white shadow-lg md:p-8">
+                        <div class="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+                            <div class="max-w-2xl">
+                                <p class="mb-3 inline-flex rounded-full bg-white/20 px-3 py-1 text-sm font-medium">오늘의 추천</p>
+                                <h2 class="text-2xl font-bold tracking-tight md:text-3xl">전통 맛집부터 트렌디한 한식까지, 한눈에 둘러보세요.</h2>
+                                <p class="mt-3 text-sm leading-6 text-orange-50 md:text-base">지역별로 정리된 식당 정보를 바탕으로, 분위기와 메뉴를 한 번에 확인할 수 있는 UI로 구성했습니다.</p>
+                            </div>
+                            <div class="flex flex-wrap gap-2">
+                                <span class="rounded-full bg-white/20 px-3 py-2 text-sm font-medium">#전통한식</span>
+                                <span class="rounded-full bg-white/20 px-3 py-2 text-sm font-medium">#데이트코스</span>
+                                <span class="rounded-full bg-white/20 px-3 py-2 text-sm font-medium">#가성비</span>
+                            </div>
+                        </div>
+                    </section>
+
+                    <div class="grid gap-4 md:grid-cols-3">
+                        <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                            <p class="text-sm text-slate-500">추천 수</p>
+                            <p class="mt-1 text-2xl font-bold text-slate-900">120+</p>
+                        </div>
+                        <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                            <p class="text-sm text-slate-500">평균 평점</p>
+                            <p class="mt-1 text-2xl font-bold text-slate-900">4.7</p>
+                        </div>
+                        <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                            <p class="text-sm text-slate-500">실시간 업데이트</p>
+                            <p class="mt-1 text-2xl font-bold text-slate-900">준비중</p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                        <div v-for="r in restaurants" :key="r.id" class="group overflow-hidden rounded-[24px] border border-slate-200 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
+                            <div class="flex h-36 items-center justify-center overflow-hidden bg-gradient-to-br from-orange-50 via-white to-amber-50 text-sm font-medium text-slate-400">
+                                <img v-if="r.imageUrl" :src="r.imageUrl" :alt="r.name" class="h-full w-full object-cover">
+                                <span v-else>{{ r.imageLabel }}</span>
+                            </div>
+                            <div class="p-5">
+                                <div class="mb-3 flex items-center justify-between">
+                                    <span class="rounded-full bg-orange-50 px-2.5 py-1 text-xs font-semibold text-orange-600">{{ r.badge }}</span>
+                                    <span class="text-sm font-semibold text-slate-500">⭐ {{ r.rating }}</span>
+                                </div>
+                                <h3 class="text-lg font-bold text-slate-900">{{ r.name }}</h3>
+                                <p class="mt-1 text-sm text-slate-500">{{ r.category }} · {{ r.area }}</p>
+                                <p class="mt-1 text-sm text-slate-500">{{ r.address }}</p>
+                                <p class="mt-3 text-sm leading-6 text-slate-600">{{ r.description }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        const { createApp, ref, onMounted } = Vue;
+        createApp({
+            setup() {
+                const restaurants = ref([]);
+
+                const inferCategory = (title) => {
+                    const lower = title.toLowerCase();
+                    if (lower.includes('한정식') || lower.includes('설렁탕') || lower.includes('곰탕') || lower.includes('떡갈비') || lower.includes('백반')) return '한식';
+                    if (lower.includes('짬뽕') || lower.includes('중식') || lower.includes('중국')) return '중식';
+                    if (lower.includes('라멘') || lower.includes('초밥') || lower.includes('스시') || lower.includes('일식')) return '일식';
+                    if (lower.includes('파스타') || lower.includes('피자') || lower.includes('양식')) return '양식';
+                    return '맛집';
+                };
+
+                const normalizeRestaurant = (item, index) => {
+                    const title = item.title || '식당 정보';
+                    const address = item.addr1 || '주소 정보 없음';
+                    const category = inferCategory(title);
+                    const rating = (4.5 + (index % 4) * 0.1).toFixed(1);
+                    const badge = category === '한식' ? '전통' : category === '일식' ? '신규' : '추천';
+
+                    return {
+                        id: Number(item.contentid) || index + 1,
+                        name: title,
+                        category,
+                        area: address.split(' ')[0] || '광주',
+                        rating,
+                        badge,
+                        address,
+                        description: `${title}의 기본 정보를 바탕으로 정리한 식당 카드입니다.`,
+                        imageLabel: item.firstimage ? '이미지 있음' : '이미지 준비중',
+                        imageUrl: item.firstimage || ''
+                    };
+                };
+
+                const loadRestaurants = async () => {
+                    try {
+                        const response = await fetch('./광주_전라권_음식점.json');
+                        if (!response.ok) throw new Error('JSON 로딩 실패');
+                        const data = await response.json();
+                        const items = Array.isArray(data?.items) ? data.items : [];
+                        restaurants.value = items.slice(0, 12).map(normalizeRestaurant);
+                    } catch (error) {
+                        console.warn('로컬 JSON 로딩 실패, 임시 데이터로 대체합니다.', error);
+                        restaurants.value = [
+                            { id: 1, name: '제일반점', category: '중식', area: '동구', rating: '4.8', badge: '추천', address: '전남광주통합특별시 동구 구성로 174', description: '실제 JSON 데이터 연결 전 임시로 보여주는 기본 카드입니다.', imageLabel: '이미지 준비중', imageUrl: '' },
+                            { id: 2, name: '송정떡갈비 1호점', category: '한식', area: '광산구', rating: '4.7', badge: '전통', address: '전남광주통합특별시 광산구 광산로29번길 1', description: '실제 JSON 데이터 연결 전 임시로 보여주는 기본 카드입니다.', imageLabel: '이미지 준비중', imageUrl: '' }
+                        ];
+                    }
+                };
+
+                onMounted(() => {
+                    loadRestaurants();
+                });
+
+                return { restaurants };
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>
