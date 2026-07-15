@@ -802,28 +802,13 @@
         }
 
         function createInfoWindowContent(location) {
-          const title =
-            escapeHtml(
-              location.title || '이름 없음'
-            )
+          const title = escapeHtml(location.title || '이름 없음');
+          const address = escapeHtml(location.address || '주소 정보가 없습니다.');
+          const imageUrl = location.image_url ? escapeHtml(location.image_url) : '';
+          const categoryName = categories.find(category => category.code === location.category_code)?.name || '분류 정보 없음';
 
-          const address =
-            escapeHtml(
-              location.address
-              || '주소 정보가 없습니다.'
-            )
-
-          const imageUrl =
-            location.image_url
-              ? escapeHtml(location.image_url)
-              : ''
-
-          const categoryName =
-            categories.find(
-              category =>
-                category.code
-                === location.category_code
-            )?.name || '분류 정보 없음'
+          // [수정] 홈의 특정 가게 상세 페이지로 Query Parameter를 실어 이동하는 링크 생성
+          const detailLink = `./index.html?content_id=${encodeURIComponent(location.content_id)}`;
 
           const imageHtml = imageUrl
             ? `
@@ -836,44 +821,29 @@
                   this.nextElementSibling.style.display='flex';
                 "
               >
-
-              <div
-                class="info-window-no-image"
-                style="display: none;"
-              >
-                이미지 없음
-              </div>
+              <div class="info-window-no-image" style="display: none;">이미지 없음</div>
             `
-            : `
-              <div class="info-window-no-image">
-                이미지 없음
-              </div>
-            `
+            : `<div class="info-window-no-image">이미지 없음</div>`;
 
           return `
             <div class="info-window">
               ${imageHtml}
-
               <strong class="info-window-title">
                 ${title}
               </strong>
-
-              <p
-                style="
-                  margin: 0 0 6px;
-                  color: #f97316;
-                  font-size: 12px;
-                  font-weight: 700;
-                "
-              >
+              <p style="margin: 0 0 6px; color: #f97316; font-size: 12px; font-weight: 700;">
                 ${escapeHtml(categoryName)}
               </p>
-
-              <p class="info-window-address">
+              <p class="info-window-address" style="margin-bottom: 8px;">
                 ${address}
               </p>
+              <a href="${detailLink}" 
+                class="block text-center bg-orange-500 hover:bg-orange-600 text-white text-xs font-bold py-1.5 rounded-lg transition-colors"
+                style="text-decoration: none;">
+                👉 가게 상세 및 리뷰 보기
+              </a>
             </div>
-          `
+          `;
         }
 
         function closeInfoWindow() {
