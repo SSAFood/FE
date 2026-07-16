@@ -565,8 +565,8 @@
          * 같은 서버에서 프론트와 백엔드를 제공한다면
          * 빈 문자열로 설정할 수도 있습니다.
          */
-        const API_BASE_URL =
-          'http://127.0.0.1:8000'
+        const API_BASE_URL ='https://be-5861.onrender.com'
+
 
         const mapContainer = ref(null)
 
@@ -891,6 +891,20 @@
           locationCount.value =
             validLocations.length
 
+          console.log(
+            `[지도] 전체 ${locations.length}개 중 유효 좌표 ${validLocations.length}개`
+          )
+
+          if (
+            locations.length > 0
+            && validLocations.length === 0
+          ) {
+            console.error(
+              '[지도] 첫 번째 데이터:',
+              locations[0]
+            )
+          }
+
           markers =
             validLocations.map(location => {
               const position =
@@ -1001,10 +1015,27 @@
             ? `${API_BASE_URL}/api/locations?${queryString}`
             : `${API_BASE_URL}/api/locations`
 
+          console.log('[지도] 요청 URL:', url)
+
           const response =
-            await fetch(url)
+            await fetch(url, {
+              method: 'GET',
+              mode: 'cors',
+              credentials: 'omit',
+              headers: {
+                Accept: 'application/json',
+              },
+            })
 
           if (!response.ok) {
+            const errorText = await response.text()
+
+            console.error(
+              '[지도] API 오류:',
+              response.status,
+              errorText
+            )
+
             throw new Error(
               `음식점 데이터 조회 실패: ${response.status}`
             )
@@ -1012,6 +1043,11 @@
 
           const data =
             await response.json()
+
+          console.log(
+            `[지도] 음식점 ${Array.isArray(data) ? data.length : 0}개 수신`,
+            Array.isArray(data) ? data.slice(0, 3) : data
+          )
 
           if (!Array.isArray(data)) {
             throw new Error(
