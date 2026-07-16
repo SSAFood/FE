@@ -1,229 +1,115 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SSAFooD - 지도</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@400;600;700&display=swap');
+        body { font-family: 'Pretendard', sans-serif; }
+        .active-tab { color: #f97316; background-color: #f97316; color: white; border-radius: 9999px; }
+        .tab-transition { transition: all 0.3s ease; }
+    
 
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
-  >
+        [v-cloak] {
+            display: none;
+        }
 
-  <title>SSAFooD 음식점 지도</title>
+        .map-container {
+            width: 100%;
+            height: 650px;
+            min-height: 60vh;
+        }
 
-  <!-- Tailwind CSS -->
-  <script src="https://cdn.tailwindcss.com"></script>
+        .filter-scroll {
+            scrollbar-width: thin;
+            scrollbar-color: #cbd5e1 transparent;
+        }
 
-  <!-- Vue 3 -->
-  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+        .filter-scroll::-webkit-scrollbar {
+            height: 6px;
+        }
 
-  <style>
-    html,
-    body {
-      margin: 0;
-      min-height: 100%;
-      background: #f8fafc;
-      font-family:
-        Pretendard,
-        -apple-system,
-        BlinkMacSystemFont,
-        "Segoe UI",
-        sans-serif;
-    }
+        .filter-scroll::-webkit-scrollbar-track {
+            background: transparent;
+        }
 
-    [v-cloak] {
-      display: none;
-    }
+        .filter-scroll::-webkit-scrollbar-thumb {
+            border-radius: 9999px;
+            background: #cbd5e1;
+        }
 
-    .map-container {
-      width: 100%;
-      height: 650px;
-      min-height: 60vh;
-    }
+        .info-window {
+            width: 250px;
+            padding: 14px;
+            box-sizing: border-box;
+            font-family: Pretendard, Arial, sans-serif;
+        }
 
-    .filter-scroll {
-      scrollbar-width: thin;
-      scrollbar-color: #cbd5e1 transparent;
-    }
+        .info-window-image {
+            width: 100%;
+            height: 120px;
+            margin-bottom: 10px;
+            border-radius: 12px;
+            object-fit: cover;
+        }
 
-    .filter-scroll::-webkit-scrollbar {
-      height: 6px;
-    }
+        .info-window-no-image {
+            display: flex;
+            width: 100%;
+            height: 100px;
+            margin-bottom: 10px;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            background: #f1f5f9;
+            color: #94a3b8;
+            font-size: 12px;
+        }
 
-    .filter-scroll::-webkit-scrollbar-track {
-      background: transparent;
-    }
+        .info-window-title {
+            display: block;
+            margin-bottom: 6px;
+            color: #0f172a;
+            font-size: 15px;
+            font-weight: 700;
+            line-height: 1.4;
+        }
 
-    .filter-scroll::-webkit-scrollbar-thumb {
-      border-radius: 9999px;
-      background: #cbd5e1;
-    }
+        .info-window-address {
+            margin: 0;
+            color: #64748b;
+            font-size: 12px;
+            line-height: 1.5;
+        }
 
-    .info-window {
-      width: 250px;
-      padding: 14px;
-      box-sizing: border-box;
-      font-family:
-        Pretendard,
-        Arial,
-        sans-serif;
-    }
-
-    .info-window-image {
-      width: 100%;
-      height: 120px;
-      margin-bottom: 10px;
-      border-radius: 12px;
-      object-fit: cover;
-    }
-
-    .info-window-no-image {
-      display: flex;
-      width: 100%;
-      height: 100px;
-      margin-bottom: 10px;
-      align-items: center;
-      justify-content: center;
-      border-radius: 12px;
-      background: #f1f5f9;
-      color: #94a3b8;
-      font-size: 12px;
-    }
-
-    .info-window-title {
-      display: block;
-      margin-bottom: 6px;
-      color: #0f172a;
-      font-size: 15px;
-      font-weight: 700;
-      line-height: 1.4;
-    }
-
-    .info-window-address {
-      margin: 0;
-      color: #64748b;
-      font-size: 12px;
-      line-height: 1.5;
-    }
-
-    @media (max-width: 768px) {
-      .map-container {
-        height: 520px;
-      }
-    }
-  </style>
+        @media (max-width: 768px) {
+            .map-container {
+                height: 520px;
+            }
+        }
+</style>
 </head>
-
-<body>
-  <div
-    id="app"
-    v-cloak
-  >
-    <div
-      class="
-        mx-auto min-h-screen max-w-7xl
-        px-3 py-3 md:px-6 md:py-6 lg:px-8
-      "
-    >
-      <div
-        class="
-          min-h-[calc(100vh-24px)]
-          overflow-hidden rounded-[32px]
-          border border-slate-200
-          bg-white
-          shadow-[0_20px_60px_-20px_rgba(15,23,42,0.25)]
-        "
-      >
-        <!-- 네비게이션 -->
-        <header
-          class="
-            sticky top-0 z-50
-            border-b border-slate-100
-            bg-white/90 px-5 py-4
-            backdrop-blur md:px-8
-          "
-        >
-          <div
-            class="
-              flex flex-col gap-3
-              md:flex-row
-              md:items-center
-              md:justify-between
-            "
-          >
-            <a
-              href="/"
-              class="block"
-            >
-              <p
-                class="
-                  text-sm font-semibold uppercase
-                  tracking-[0.3em] text-orange-500
-                "
-              >
-                SSAFooD
-              </p>
-
-              <h1
-                class="
-                  text-2xl font-bold tracking-tight
-                  text-slate-900
-                "
-              >
-                광주 전라권 맛집 탐색
-              </h1>
-            </a>
-
-            <nav
-              class="
-                flex flex-wrap gap-2
-                rounded-full
-                border border-slate-200
-                bg-slate-50 p-1.5
-              "
-            >
-              <a
-                href="./index.html"
-                class="
-                  rounded-full px-4 py-2
-                  text-sm font-semibold
-                  text-slate-600 transition
-                  hover:bg-white
-                  hover:text-orange-500
-                "
-              >
-                홈
-              </a>
-
-              <a
-                href="./map.html"
-                class="
-                  rounded-full
-                  bg-orange-500
-                  px-4 py-2
-                  text-sm font-semibold
-                  text-white shadow-sm
-                "
-              >
-                지도
-              </a>
-
-              <a
-                href="./chat.html"
-                class="
-                  rounded-full px-4 py-2
-                  text-sm font-semibold
-                  text-slate-600 transition
-                  hover:bg-white
-                  hover:text-orange-500
-                "
-              >
-                AI 챗봇
-              </a>
-            </nav>
-          </div>
-        </header>
-
-        <!-- 메인 -->
+<body class="bg-[radial-gradient(circle_at_top,_#fff7ed,_#f8fafc_60%)] text-slate-800">
+    <div id="app" v-cloak class="mx-auto flex min-h-screen max-w-7xl flex-col px-3 py-3 md:px-6 md:py-6 lg:px-8">
+        <div class="overflow-hidden rounded-[32px] border border-slate-200 bg-white shadow-[0_20px_60px_-20px_rgba(15,23,42,0.25)]">
+            <!-- Header / Navigation -->
+            <header class="sticky top-0 z-50 border-b border-slate-100 bg-white/90 px-5 py-4 backdrop-blur md:px-8">
+                <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                    <div>
+                        <p class="text-sm font-semibold uppercase tracking-[0.3em] text-orange-500">SSAFooD</p>
+                        <h1 class="text-2xl font-bold tracking-tight text-slate-900">광주 전라권 맛집 탐색</h1>
+                    </div>
+                    <nav class="flex flex-wrap gap-2 rounded-full border border-slate-200 bg-slate-50 p-1.5">
+                        <a href="index.html" class="rounded-full px-4 py-2 text-sm font-semibold tab-transition text-slate-600 hover:bg-white hover:text-orange-500 cursor-pointer">홈</a>
+                        <a href="map.html" class="rounded-full px-4 py-2 text-sm font-semibold tab-transition active-tab bg-orange-500 text-white shadow-sm cursor-pointer">지도</a>
+                        <a href="chat.html" class="rounded-full px-4 py-2 text-sm font-semibold tab-transition text-slate-600 hover:bg-white hover:text-orange-500 cursor-pointer">AI 챗봇</a>
+                    </nav>
+                </div>
+            </header>
+<!-- 메인 -->
         <main class="p-4 md:p-8">
           <section class="mb-6">
             <p
@@ -441,11 +327,9 @@
             </div>
           </section>
         </main>
-      </div>
+        </div>
     </div>
-  </div>
-
-  <script>
+    <script>
     const {
       createApp,
       computed,
