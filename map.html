@@ -169,7 +169,7 @@
                   text-slate-900
                 "
               >
-                광주·전라권 맛집 탐색
+                광주 전라권 맛집 탐색
               </h1>
             </a>
 
@@ -232,7 +232,7 @@
                 text-orange-500
               "
             >
-              광주·전라권 음식점 지도
+              광주 전라권 음식점 지도
             </p>
 
             <h2
@@ -250,183 +250,85 @@
                 leading-6 text-slate-500
               "
             >
-              지역과 음식 종류를 선택하면 조건에 맞는
-              음식점 마커만 지도에 표시됩니다.
+              지역과 음식 종류를 선택해 원하는 맛집을
+              지도에서 확인해보세요.
             </p>
           </section>
 
-          <!-- 지역 필터 -->
-          <section
+          <!-- 홈 화면과 동일한 필터 디자인 -->
+          <div
             class="
-              mb-4 rounded-[24px]
-              border border-slate-200
-              bg-white p-4 shadow-sm
+              mb-6 space-y-4
+              rounded-3xl border border-slate-200
+              bg-slate-50 p-4 md:p-6
             "
           >
-            <div
-              class="
-                mb-3 flex items-center
-                justify-between gap-3
-              "
-            >
-              <div>
-                <p
-                  class="
-                    text-sm font-bold
-                    text-slate-700
-                  "
-                >
-                  지역 선택
-                </p>
+            <!-- 카테고리 선택 -->
+            <div>
+              <p
+                class="
+                  mb-3 text-sm font-semibold
+                  text-slate-500
+                "
+              >
+                🏷️ 카테고리 선택
+              </p>
 
-                <p
-                  class="
-                    mt-1 text-xs
-                    text-slate-400
-                  "
+              <div class="flex flex-wrap gap-2">
+                <button
+                  v-for="category in categories"
+                  :key="category.code || 'all-category'"
+                  type="button"
+                  :class="[
+                    'rounded-full px-4 py-2 text-xs md:text-sm font-medium transition-all',
+                    selectedCategory === category.code
+                      ? 'bg-orange-500 text-white shadow-sm'
+                      : 'bg-white border border-slate-200 text-slate-600 hover:bg-orange-50 hover:text-orange-500'
+                  ]"
+                  @click="selectCategory(category)"
                 >
-                  광역 코드와 시군구 코드를 함께 비교합니다.
-                </p>
+                  {{ category.name }}
+                </button>
               </div>
-
-              <button
-                type="button"
-                class="
-                  rounded-full border
-                  border-slate-200
-                  px-3 py-1.5
-                  text-xs font-semibold
-                  text-slate-500 transition
-                  hover:border-orange-300
-                  hover:text-orange-500
-                "
-                @click="resetFilters"
-              >
-                전체 초기화
-              </button>
             </div>
 
-            <div
-              class="
-                filter-scroll
-                flex gap-2 overflow-x-auto
-                pb-2
-              "
-            >
-              <button
-                v-for="region in regions"
-                :key="
-                  region.name === '전체'
-                    ? 'all-region'
-                    : `${region.areacode}-${region.sigungucode}`
-                "
-                type="button"
-                class="
-                  shrink-0 rounded-full
-                  border px-4 py-2
-                  text-sm font-semibold
-                  transition
-                "
-                :class="
-                  isSelectedRegion(region)
-                    ? 'border-orange-500 bg-orange-500 text-white shadow-sm'
-                    : 'border-slate-200 bg-white text-slate-600 hover:border-orange-300 hover:text-orange-500'
-                "
-                @click="selectRegion(region)"
-              >
-                {{ region.name }}
-              </button>
-            </div>
-          </section>
+            <hr class="border-slate-200">
 
-          <!-- 음식 분류 필터 -->
-          <section
-            class="
-              mb-4 rounded-[24px]
-              border border-slate-200
-              bg-white p-4 shadow-sm
-            "
-          >
-            <div class="mb-3">
+            <!-- 지역 선택 -->
+            <div>
               <p
                 class="
-                  text-sm font-bold
-                  text-slate-700
+                  mb-3 text-sm font-semibold
+                  text-slate-500
                 "
               >
-                음식 분류
+                📍 지역 선택
               </p>
 
-              <p
-                class="
-                  mt-1 text-xs
-                  text-slate-400
-                "
-              >
-                cat3 음식 분류 코드를 기준으로 필터링합니다.
-              </p>
+              <div class="flex flex-wrap gap-2">
+                <button
+                  v-for="region in regions"
+                  :key="
+                    region.name === '전체지역'
+                      ? 'all-region'
+                      : region.name === '기타 지역'
+                        ? 'other-region'
+                        : `${region.areacode}-${region.sigungucode}`
+                  "
+                  type="button"
+                  :class="[
+                    'rounded-full px-4 py-2 text-xs md:text-sm font-medium transition-all',
+                    isSelectedRegion(region)
+                      ? 'bg-orange-500 text-white shadow-sm'
+                      : 'bg-white border border-slate-200 text-slate-600 hover:bg-orange-50 hover:text-orange-500'
+                  ]"
+                  @click="selectRegion(region)"
+                >
+                  {{ region.name }}
+                </button>
+              </div>
             </div>
-
-            <div
-              class="
-                filter-scroll
-                flex gap-2 overflow-x-auto
-                pb-2
-              "
-            >
-              <button
-                v-for="category in categories"
-                :key="category.code || 'all-category'"
-                type="button"
-                class="
-                  shrink-0 rounded-full
-                  border px-4 py-2
-                  text-sm font-semibold
-                  transition
-                "
-                :class="
-                  selectedCategory === category.code
-                    ? 'border-sky-500 bg-sky-500 text-white shadow-sm'
-                    : 'border-slate-200 bg-white text-slate-600 hover:border-sky-300 hover:text-sky-500'
-                "
-                @click="selectCategory(category)"
-              >
-                {{ category.name }}
-              </button>
-            </div>
-          </section>
-
-          <!-- 현재 선택 상태 -->
-          <section
-            class="
-              mb-4 flex flex-wrap
-              items-center gap-2
-            "
-          >
-            <span
-              class="
-                rounded-full
-                bg-orange-50 px-3 py-1.5
-                text-xs font-semibold
-                text-orange-600
-              "
-            >
-              지역:
-              {{ selectedRegionName || '전체' }}
-            </span>
-
-            <span
-              class="
-                rounded-full
-                bg-sky-50 px-3 py-1.5
-                text-xs font-semibold
-                text-sky-600
-              "
-            >
-              분류:
-              {{ selectedCategoryName || '전체' }}
-            </span>
-          </section>
+          </div>
 
           <!-- 지도 -->
           <section
@@ -575,7 +477,7 @@
         const locationCount = ref(0)
 
         const selectedRegion = ref({
-          name: '전체',
+          name: '전체지역',
           areacode: '',
           sigungucode: '',
         })
@@ -584,11 +486,10 @@
 
         const regions = [
           {
-            name: '전체',
+            name: '전체지역',
             areacode: '',
             sigungucode: '',
           },
-
           {
             name: '광주 광산구',
             areacode: '5',
@@ -614,7 +515,6 @@
             areacode: '5',
             sigungucode: '5',
           },
-
           {
             name: '전북 전주',
             areacode: '37',
@@ -625,16 +525,10 @@
             areacode: '37',
             sigungucode: '4',
           },
-
           {
             name: '전남 나주',
             areacode: '38',
             sigungucode: '6',
-          },
-          {
-            name: '전남 담양',
-            areacode: '38',
-            sigungucode: '7',
           },
           {
             name: '전남 순천',
@@ -646,11 +540,21 @@
             areacode: '38',
             sigungucode: '13',
           },
+          {
+            name: '전남 담양',
+            areacode: '38',
+            sigungucode: '7',
+          },
+          {
+            name: '기타 지역',
+            areacode: 'other',
+            sigungucode: 'other',
+          },
         ]
 
         const categories = [
           {
-            name: '전체',
+            name: '전체보기',
             code: '',
           },
           {
@@ -682,12 +586,12 @@
             code: 'A05020700',
           },
           {
-            name: '바·주류',
-            code: 'A05020800',
+            name: '카페/전통찻집',
+            code: 'A05020900',
           },
           {
-            name: '카페·전통찻집',
-            code: 'A05020900',
+            name: '바(Bar) 및 주류',
+            code: 'A05020800',
           },
         ]
 
@@ -987,14 +891,23 @@
           const params =
             new URLSearchParams()
 
-          if (filters.areacode) {
+          const isOtherRegion =
+            filters.areacode === 'other'
+
+          if (
+            filters.areacode
+            && !isOtherRegion
+          ) {
             params.set(
               'areacode',
               filters.areacode
             )
           }
 
-          if (filters.sigungucode) {
+          if (
+            filters.sigungucode
+            && !isOtherRegion
+          ) {
             params.set(
               'sigungucode',
               filters.sigungucode
@@ -1053,6 +966,32 @@
             throw new Error(
               '음식점 API 응답 형식이 올바르지 않습니다.'
             )
+          }
+
+          if (isOtherRegion) {
+            const mainRegionKeys =
+              new Set([
+                '5-1',
+                '5-2',
+                '5-3',
+                '5-4',
+                '5-5',
+                '37-12',
+                '37-4',
+                '38-6',
+                '38-11',
+                '38-13',
+                '38-7',
+              ])
+
+            return data.filter(location => {
+              const regionKey =
+                `${String(location.areacode ?? '')}`
+                + '-'
+                + `${String(location.sigungucode ?? '')}`
+
+              return !mainRegionKeys.has(regionKey)
+            })
           }
 
           return data
@@ -1115,7 +1054,7 @@
 
         async function resetFilters() {
           selectedRegion.value = {
-            name: '전체',
+            name: '전체지역',
             areacode: '',
             sigungucode: '',
           }
